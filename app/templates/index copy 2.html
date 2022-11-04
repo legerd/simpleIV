@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html>
+    <head>
+    </head>
+    <style>
+    .img-container{
+        display: flex;
+        flex-wrap: wrap;
+    }
+    .album-viewer{
+        background:#ccc;
+    }
+    .img-box{
+        height:250px;
+        height:250px;
+        object-fit: contain;
+    }
+    .img{
+        height: 200px;
+    cursor: pointer;
+    margin: 5px;
+    display: inline-block;
+    }
+    .prompt-album-thumb{
+        height: 150px;
+        width: 150px;
+        object-fit: cover;
+        cursor: pointer;
+        margin: 5px;
+        display: inline-block;
+    }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.7.11"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/viewerjs@1.5.0/dist/viewer.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/viewerjs@1.5.0/dist/viewer.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/v-viewer@1.5.1/dist/v-viewer.min.js"></script>
+    <body >
+        <div id="app">
+            <h1>プロンプトアルバム</h1>
+            {{ pagination_prompt.info }}
+            {{ pagination_prompt.links }}
+            <div class="prompt-albums">
+                <template v-for="(prompt_thumb,index) in prompt_thumb_list_page" :key="index">
+                    <img @click="openPromptAlbum(index)" class="prompt-album-thumb" :src="prompt_thumb">
+                    <div v-if="opened_prompt==index" v-viewer class="album-viewer">opened
+                        [[promptsUniqueOfIndex]]
+                        <template v-for="(src,index) in getImgOfPrompt(index)">
+                            <img :src="src" :key="index" class="img">
+                        </template>
+                        
+                    </div>
+                </template>
+            </div>
+            {{pagination_prompt.links}}
+            <h1>全画像</h1>
+            <!-- <img src="static/kame.jpg" alt="鳥居"> -->
+            {{ln}}
+            {{ pagination.info }}
+            {{ pagination.links }}
+            
+            <!-- <div class="img-container"> -->
+            <div v-viewer class="img-viewer">
+                <template v-for="src in img_src_list">
+                  <img :src="src" :key="src" class="img">
+                </template>
+            </div >
+            <!-- </div> -->
+            <!-- <div class="img-container">
+                
+                <div v-for="img_src in img_src_list" class="img-box" >
+                    <img v-on:click="expansion" v-bind:src="img_src" alt="">
+                </div>
+            </div>-->
+            {{ pagination.links }}
+        </div>
+    </body>
+    <script>
+        const Viewer = window['VueViewer'].default;
+        Vue.use(Viewer);
+        var img_src_list=eval({{img_src_list|tojson}});
+        // var img_src_list=eval({{img_src_list|tojson}});
+        var prompt_thumb_list_page=eval({{prompt_thumb_list_page|tojson}});
+        var img_list_per_prompt_id=eval({{img_list_per_prompt_id|tojson}});
+        var page_prompt=eval({{pagination_prompt.page|tojson}});
+        var per_page_prompt=eval({{pagination_prompt.per_page}});
+        var prompts_unique=eval({{prompts_unique|tojson}});
+        var app = new Vue({
+            el: '#app',
+            delimiters: ["[[","]]"],
+            data: {
+                message: 'Hello Vue!',
+                img_src_list: img_src_list,
+                prompt_thumb_list_page:prompt_thumb_list_page,
+                img_list_per_prompt_id:img_list_per_prompt_id,
+                opened_prompt:-1,
+                page_prompt:page_prompt,
+                per_page_prompt:per_page_prompt,
+                prompts_unique:prompts_unique,
+            },
+            computed:{
+                promptsUniqueOfIndex: function(){
+                    return this.prompts_unique[this.getTotalIndexOfPrompt(this.opened_prompt)]
+                }
+            },
+            methods: {
+                expansion: function(){
+                    alert("hello")
+                },
+                openPromptAlbum: function(index){
+                    this.opened_prompt=index
+                },
+                getTotalIndexOfPrompt(index){
+                    return index+(this.page_prompt-1)*this.per_page_prompt
+                },
+                getImgOfPrompt: function(index){
+                    return img_list_per_prompt_id[this.getTotalIndexOfPrompt(index)]
+                }
+            },
+            
+        })
+    </script>
+</html>
