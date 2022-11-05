@@ -114,4 +114,4 @@ def get_img_id_from_path(path):
     return int(os.path.basename(path)[:5])
 #おまじない
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run()
