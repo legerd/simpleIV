@@ -17,7 +17,19 @@ def get_pnginfo(path):
 
 #Flaskオブジェクトの生成
 app = Flask(__name__)
+from pyngrok import ngrok
 
+# Get the dev server port (defaults to 5000 for Flask, can be overridden with `--port`
+# when starting the server
+port = 5000
+
+# Open a ngrok tunnel to the dev server
+public_url = ngrok.connect(port).public_url
+print(" * ngrok tunnel \"{}\" -> \"http://127.0.0.1:{}\"".format(public_url, port))
+
+# Update any base URLs or webhooks to use the public ngrok URL
+app.config["BASE_URL"] = public_url
+init_webhooks(public_url)
 
 #「/」へアクセスがあった場合に、"Hello World"の文字列を返す
 @app.route("/")
@@ -47,7 +59,7 @@ def album():
     name_id=-1
     names_unique=[]
     img_list_per_name_id=[]
-    
+
     for i,name in enumerate(name_list):
         if last_name!=name:
             name_id+=1
