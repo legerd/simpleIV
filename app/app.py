@@ -8,31 +8,19 @@ import hashlib
 import re
 import time
 
+from flask_ngrok import run_with_ngrok
+
 
 ptn=re.compile(r'Seed: \d+')
 def get_pnginfo(path):
     targetImage = Image.open(path)
     text=re.sub(ptn,'',targetImage.text["parameters"])
     return str(text)
-def init_webhooks(base_url):
-    # Update inbound traffic via APIs to use the public-facing ngrok URL
-    pass
+
 
 #Flaskオブジェクトの生成
 app = Flask(__name__)
-from pyngrok import ngrok
-
-# Get the dev server port (defaults to 5000 for Flask, can be overridden with `--port`
-# when starting the server
-port = 5000
-
-# Open a ngrok tunnel to the dev server
-public_url = ngrok.connect(port).public_url
-print(" * ngrok tunnel \"{}\" -> \"http://127.0.0.1:{}\"".format(public_url, port))
-
-# Update any base URLs or webhooks to use the public ngrok URL
-app.config["BASE_URL"] = public_url
-init_webhooks(public_url)
+run_with_ngrok(app)
 
 #「/」へアクセスがあった場合に、"Hello World"の文字列を返す
 @app.route("/")

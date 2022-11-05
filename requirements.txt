@@ -1,3 +1,4 @@
 flask
 flask_paginate
 pyngrok
+flask_ngrok
