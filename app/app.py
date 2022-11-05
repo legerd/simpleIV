@@ -14,6 +14,9 @@ def get_pnginfo(path):
     targetImage = Image.open(path)
     text=re.sub(ptn,'',targetImage.text["parameters"])
     return str(text)
+def init_webhooks(base_url):
+    # Update inbound traffic via APIs to use the public-facing ngrok URL
+    pass
 
 #Flaskオブジェクトの生成
 app = Flask(__name__)
