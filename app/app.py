@@ -64,7 +64,7 @@ def history():
     generation_type= request.args.get("type", type=str, default="t2i")
     s_zero=time.time()
     page= request.args.get("page", type=int, default=1)
-    limit = 5
+    limit = 10
     if generation_type=="t2i":
         img_src_list=glob.glob("/storage/data/stable-diffusion-webui/outputs/txt2img-images/*.png")
     else:
