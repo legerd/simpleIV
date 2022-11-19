@@ -69,7 +69,7 @@ def history():
         img_src_list=glob.glob("/storage/data/stable-diffusion-webui/outputs/txt2img-images/*.png")
     else:
         img_src_list=("/storage/data/stable-diffusion-webui/outputs/img2img-images/*.png")
-    # img_src_list=[img_src.replace("/mnt/vol_b/","/static/") for img_src in img_src_list]
+    img_src_list=[img_src.replace("/storage/data/","/static/") for img_src in img_src_list]
     img_src_list=sorted(img_src_list,key=get_img_id_from_path, reverse=True)
     img_src_list_page=img_src_list[(page - 1)*limit: page*limit]
     ln=len(img_src_list)
