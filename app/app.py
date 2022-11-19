@@ -1,5 +1,4 @@
 OUTPUTS_DIR="/storage/data/"
-OUTPUTS_DIR="/Users/shono/workspace/nai/test/"
 STATIC_DIR="/static/"
 # STATIC_DIR="~/workspace/nai/test/"
 from flask import Flask,render_template, request,jsonify
