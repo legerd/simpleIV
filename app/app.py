@@ -7,6 +7,9 @@ from PIL.PngImagePlugin import PngInfo
 import hashlib
 import re
 import time
+# import paramiko
+import warnings
+from pyngrok import ngrok
 
 # from flask_ngrok import run_with_ngrok
 
@@ -20,6 +23,39 @@ def get_pnginfo(path):
 
 #Flaskオブジェクトの生成
 app = Flask(__name__)
+# client = paramiko.SSHClient()
+# client.set_missing_host_key_policy(paramiko.WarningPolicy())
+
+# try:
+#     with warnings.catch_warnings():
+#         warnings.simplefilter("ignore")
+#     client.connect(
+#         hostname="192.168.0.95",
+#         port=5000,
+#         username="shono",
+#         password="shonoworld",
+#     )
+# except Exception as e:
+#     print(f'*** Failed to connect to {payload["host"]}:{payload["port"]}: {e}')
+ngrok.set_auth_token("2H7nHFpElYVDRx5r1qSVDAju4Qq_7UpE8bwMWJkwnYvC36CSw")
+
+http_tunnel = ngrok.connect(5000)
+tunnels = ngrok.get_tunnels()
+print(tunnels)
+
+
+# thread = threading.Thread(
+#     target=reverse_forward_tunnel,
+#     args=(
+#         int(payload["remote_port"]),
+#         local_server,
+#         local_server_port,
+#         client.get_transport(),
+#     ),
+#     daemon=True,
+# )
+# thread.start()
+
 # run_with_ngrok(app)
 
 #「/」へアクセスがあった場合に、"Hello World"の文字列を返す
