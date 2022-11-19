@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html>
+    
+    <head>
+    </head>
+    <style>
+        .contents{
+            margin: 0;
+            padding-left:0;
+        }
+        .contents li{
+            list-style: none;
+        }
+        .album-viewer{
+            background:#eee;
+            padding:3px 8px;
+        }
+        .img-box{
+            height:250px;
+            height:250px;
+            object-fit: contain;
+        }
+        .img{
+            height: 200px;
+        cursor: pointer;
+        margin: 5px;
+        display: inline-block;
+        }
+        .prompt-album-thumb{
+            height: 100%;
+            width: 100%;
+            object-fit: cover;
+            cursor: pointer;
+            margin: 5px;
+            display: inline-block;
+            /* position:relative; */
+        }
+        .prompt-albums{
+            display:flex;
+            flex-wrap: wrap;
+        }
+        .album-box p{
+            position: absolute;
+            bottom: 0px;
+            left:0px;
+            /* z-index:25; */
+            line-height: 15px;
+            background:#ffffffcc;
+            padding:8px;
+        }
+        .prompt-album-thumb::after{
+            position: absolute;
+            bottom: 2px;
+            content: "44";
+            z-index:5;
+            /* left: 2px; */
+        }
+        #app{
+            /* margin:0 30px; */
+        }
+
+        .album-box{
+            position:relative;
+            /* display:box; */
+            height:150px;
+            width:120px;
+            margin:6px;
+        }
+        .png-info{
+            font-size:16px;
+            line-height: 20px;
+            height:80px;
+            overflow:hidden;
+            border:solid 1px #666;
+            background:white;
+            white-space: pre-line;
+            transition:0.3s;
+            margin:4px 0;
+            padding:6px;
+        }
+        .png-info.opened{
+            height:auto;
+        }
+        h1{
+            width:500px;
+        }
+
+        .tab-button{
+            background:#f3f3f3;
+            border-radius: 6px;
+            transition:0.1s;
+            width:100px;
+            height:40px;
+            
+        }
+        .tab-button a{
+            text-decoration: none;
+            color:#444;
+            display: block;
+            width: 100%;
+            height: 100%;
+            text-align: center;
+            line-height:40px;
+        }
+        .tab-button:hover{
+            background:#e9e9e9;
+            color:#336;
+        }
+        .tab-button:click{
+            background:white;
+        }
+        .header{
+            display:flex;
+            flex-flow: wrap;
+            align-items:center;
+            border-bottom: solid 1px #666;
+            margin:20px 0;
+        }
+        h1>.subtitle{
+            font-size:0.8em;
+        }
+        .view{
+            margin-left: 220px;
+            max-width: 800px;
+            padding: 20px 20px;
+        
+        }
+        .view img{
+            width:100%;
+        }
+        .sidebar{
+            height: 100%;
+            width:220px;
+            padding:20px 0px 5px 10px;
+            top: 0px;
+            position: fixed;
+            overflow: auto;
+            background: white;
+            /* border-right:solid 1px #333; */
+            box-shadow:0 0 5px 0px #666;
+        }
+        .sidebar ul{
+            margin:10px 0;
+            padding:0;
+            padding-left:10px;
+        }
+        .sidebar ul li{
+            list-style-type:none;
+            padding:0 10px 0 4px;
+        }
+        li.is-active{
+            background: #ddd;
+        }
+        li{
+            overflow: hidden;
+            display: -webkit-box;
+            -webkit-box-orient: vertical;
+            -webkit-line-clamp: 2;
+        }
+    </style>
+    <!-- <script src="https://cdn.jsdelivr.net/npm/vue@2.7.11"></script> -->
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.7.13/dist/vue.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/viewerjs@1.5.0/dist/viewer.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/viewerjs@1.5.0/dist/viewer.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/v-viewer@1.5.1/dist/v-viewer.min.js"></script>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <body >
+        <div id="app">
+            <div class="contents">
+                
+                
+                <div class="img-viewer">
+                    
+                    <div class="sidebar">
+                        {{ pagination.info }}
+                        {{ pagination.links }}
+                        <ul>
+                            <template v-for="(src,index) in img_name_list">
+                                <li :key="src" @click="selectImg(index)" :class="{'is-active':index==selected_id}">[[src]]</li>
+                                <!-- <img :src="src" :key="src" class="img"> -->
+                            </template>
+                        </ul>
+                        {{ pagination.links }}
+                    </div>
+                    <div class="view">
+                        <img :src="src_selected">
+                        <p>[[meta]]</p>
+                    </div>
+                </div>
+                      
+                
+            </div>
+        </div>
+    </body>
+    <script>
+        Vue.config.devtools = true;
+        const Viewer = window['VueViewer'].default;
+        Vue.use(Viewer);
+        var img_src_list={{img_src_list|tojson}};
+        let meta={{meta|tojson}};
+        console.log(meta);
+        // console.log(prompt_info_list[0])
+        var app = new Vue({
+            el: '#app',
+            delimiters: ["[[","]]"],
+            data: {
+                img_src_list:img_src_list,
+                meta:meta,
+                opened_prompt:-1,
+                isActive: "1",
+                pngInfoClass: {
+                    "png-info":true,
+                    "opened":false,
+                },
+                selected_id:0,
+                // infoOfPrompt:"",
+            },
+            computed:{
+                img_name_list:function(){
+                    var GetFilename = (path) => path.split('/').pop();
+                    let res=[];
+                    for(let src of this.img_src_list){
+                        let fname=GetFilename(src);
+                        // let filename = src.match(/([^/]*)\./)[1];
+                        res.push(fname);
+                    }
+                    return res;
+                },
+                src_selected:function(){
+                    return img_src_list[this.selected_id];
+                },
+            },
+            watch: {
+                selected_id:function(val){
+                    var vm = this
+                    console.log("path:",location.host+"/pnginfo?path="+encodeURIComponent(this.img_src_list[val]));
+                    axios.get("pnginfo?path="+encodeURIComponent(this.img_src_list[val]))
+                        .then(function(response){
+                            console.log("meta: "+response.data.meta);
+                            vm.meta=response.data.meta;
+                            // this.metza=response;
+                        });
+                },
+            },
+            methods:{
+                selectImg:function(index){
+                    this.selected_id=index;
+                }
+            }
+            
+        })
+    </script>
+</html>

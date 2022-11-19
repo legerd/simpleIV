@@ -1,4 +1,8 @@
-from flask import Flask,render_template, request
+OUTPUTS_DIR="/storage/data/"
+OUTPUTS_DIR="/Users/shono/workspace/nai/test/"
+STATIC_DIR="/static/"
+# STATIC_DIR="~/workspace/nai/test/"
+from flask import Flask,render_template, request,jsonify
 import glob
 from flask_paginate import Pagination, get_page_parameter
 import os
@@ -9,20 +13,24 @@ import re
 import time
 # import paramiko
 import warnings
+from numpy import inf
 from pyngrok import ngrok
 
 # from flask_ngrok import run_with_ngrok
 
-
 ptn=re.compile(r'Seed: \d+')
-def get_pnginfo(path):
+def pnginfo_from_path(path):
     targetImage = Image.open(path)
-    text=re.sub(ptn,'',targetImage.text["parameters"])
-    return str(text)
+    if "parameters" in targetImage.text.keys():
+        text=targetImage.text["parameters"]
+        return str(text)
+    else:
+        return "this image hasn't parametas"
 
 
 #Flaskオブジェクトの生成
 app = Flask(__name__)
+app.config['JSON_AS_ASCII'] = False
 # client = paramiko.SSHClient()
 # client.set_missing_host_key_policy(paramiko.WarningPolicy())
 
@@ -60,16 +68,44 @@ print(tunnels)
 
 #「/」へアクセスがあった場合に、"Hello World"の文字列を返す
 @app.route("/")
-def history():
+def show_list():
+    generation_type= request.args.get("type", type=str, default="t2i")
+    s_zero=time.time()
+    page= request.args.get("page", type=int, default=1)
+    limit = 100
+    if generation_type=="t2i":
+        img_src_list=glob.glob(OUTPUTS_DIR+"stable-diffusion-webui/outputs/txt2img-images/*.png")
+    else:
+        img_src_list=(OUTPUTS_DIR+"stable-diffusion-webui/outputs/img2img-images/*.png")
+    img_src_list=[img_src.replace(OUTPUTS_DIR,STATIC_DIR) for img_src in img_src_list]
+    img_src_list=sorted(img_src_list,key=get_img_id_from_path, reverse=True)
+    img_src_list_page=img_src_list[(page - 1)*limit: page*limit]
+    ln=len(img_src_list)
+    # prompt_info_list_page=[get_pnginfo(img_src.replace("/static/","/mnt/vol_b/")) for img_src in img_src_list_page]
+    pagination = Pagination(page=page, per_page=limit,page_parameter="page", total=ln, css_framework='bootstrap5')
+    leng=time.time()-s_zero
+    # meta=jsonify({"meta":"jj"});
+    meta=pnginfo_from_path(img_src_list_page[0].replace(STATIC_DIR,OUTPUTS_DIR))
+    return render_template("list.html",
+        pagination=pagination,img_src_list=img_src_list_page,data=leng,meta=meta
+    )
+
+@app.route("/pnginfo")
+def get_pnginfo():
+    path=request.args.get("path", type=str, default="").replace(STATIC_DIR,OUTPUTS_DIR)
+    data={"meta":pnginfo_from_path(path)}
+    return jsonify(data)
+@app.route("/album")
+def show_album():
     generation_type= request.args.get("type", type=str, default="t2i")
     s_zero=time.time()
     page= request.args.get("page", type=int, default=1)
     limit = 10
     if generation_type=="t2i":
-        img_src_list=glob.glob("/storage/data/stable-diffusion-webui/outputs/txt2img-images/*.png")
+        img_src_list=glob.glob(OUTPUTS_DIR+"stable-diffusion-webui/outputs/txt2img-images/*.png")
     else:
-        img_src_list=("/storage/data/stable-diffusion-webui/outputs/img2img-images/*.png")
-    img_src_list=[img_src.replace("/storage/data/","/static/") for img_src in img_src_list]
+        img_src_list=(OUTPUTS_DIR+"stable-diffusion-webui/outputs/img2img-images/*.png")
+    img_src_list=[img_src.replace(OUTPUTS_DIR,STATIC_DIR) for img_src in img_src_list]
     img_src_list=sorted(img_src_list,key=get_img_id_from_path, reverse=True)
     img_src_list_page=img_src_list[(page - 1)*limit: page*limit]
     ln=len(img_src_list)
@@ -81,7 +117,11 @@ def history():
     )
 
 def get_img_id_from_path(path):
-    return int(os.path.basename(path)[:5])
+    try:
+        img_id=int(os.path.basename(path)[:5])
+    except:
+        img_id=inf
+    return img_id
 #おまじない
 if __name__ == "__main__":
     app.run()
