@@ -1,5 +1,3 @@
-OUTPUTS_DIR="/storage/data/"
-STATIC_DIR="/static/"
 # STATIC_DIR="~/workspace/nai/test/"
 from flask import Flask,render_template, request,jsonify
 import glob
@@ -14,7 +12,10 @@ import time
 import warnings
 from numpy import inf
 from pyngrok import ngrok
+import config
 
+OUTPUTS_DIR=config.OUTPUTS_DIR
+STATIC_DIR=config.STATIC_DIR
 # from flask_ngrok import run_with_ngrok
 
 ptn=re.compile(r'Seed: \d+')
