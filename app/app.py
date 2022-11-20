@@ -12,7 +12,7 @@ import time
 import warnings
 from numpy import inf
 from pyngrok import ngrok
-import config
+import app.config as config
 
 OUTPUTS_DIR=config.OUTPUTS_DIR
 STATIC_DIR=config.STATIC_DIR
