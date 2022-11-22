@@ -1,14 +1,12 @@
 # STATIC_DIR="~/workspace/nai/test/"
 from flask import Flask,render_template, request,jsonify
 import glob
-from flask_paginate import Pagination, get_page_parameter
+from flask_paginate import Pagination, 
 import os
 from PIL import Image
 from PIL.PngImagePlugin import PngInfo
-import hashlib
 import re
 import time
-# import paramiko
 import warnings
 from numpy import inf
 from pyngrok import ngrok
@@ -16,6 +14,7 @@ import app.config as config
 
 OUTPUTS_DIR=config.OUTPUTS_DIR
 STATIC_DIR=config.STATIC_DIR
+NGROK_AUTH=config.NGROK_AUTH
 # from flask_ngrok import run_with_ngrok
 
 ptn=re.compile(r'Seed: \d+')
@@ -31,42 +30,13 @@ def pnginfo_from_path(path):
 #Flaskオブジェクトの生成
 app = Flask(__name__)
 app.config['JSON_AS_ASCII'] = False
-# client = paramiko.SSHClient()
-# client.set_missing_host_key_policy(paramiko.WarningPolicy())
-
-# try:
-#     with warnings.catch_warnings():
-#         warnings.simplefilter("ignore")
-#     client.connect(
-#         hostname="192.168.0.95",
-#         port=5000,
-#         username="shono",
-#         password="shonoworld",
-#     )
-# except Exception as e:
-#     print(f'*** Failed to connect to {payload["host"]}:{payload["port"]}: {e}')
-ngrok.set_auth_token("2H7nHFpElYVDRx5r1qSVDAju4Qq_7UpE8bwMWJkwnYvC36CSw")
+ngrok.set_auth_token(NGROK_AUTH)
 
 http_tunnel = ngrok.connect(5000)
 tunnels = ngrok.get_tunnels()
 print(tunnels)
 
 
-# thread = threading.Thread(
-#     target=reverse_forward_tunnel,
-#     args=(
-#         int(payload["remote_port"]),
-#         local_server,
-#         local_server_port,
-#         client.get_transport(),
-#     ),
-#     daemon=True,
-# )
-# thread.start()
-
-# run_with_ngrok(app)
-
-#「/」へアクセスがあった場合に、"Hello World"の文字列を返す
 @app.route("/")
 def show_list():
     generation_type= request.args.get("type", type=str, default="t2i")
