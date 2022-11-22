@@ -1,7 +1,7 @@
 # STATIC_DIR="~/workspace/nai/test/"
 from flask import Flask,render_template, request,jsonify
 import glob
-from flask_paginate import Pagination, 
+from flask_paginate import Pagination
 import os
 from PIL import Image
 from PIL.PngImagePlugin import PngInfo
