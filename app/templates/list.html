@@ -233,9 +233,11 @@
                         </template>
                         <template v-else>
                             <img :src="src_selected">
-                            <div class="download-button button"><a :href="src_selected" download><i class="fas fa-download"></i></a></div>
-                            <div class="del-button button">
-                                <a @click="delSelectedImg()">削除</a>
+                            <div class="buttons">
+                                <div class="download-button button"><a :href="src_selected" download><i class="fas fa-download"></i></a></div>
+                                <div class="del-button button">
+                                    <a @click="delSelectedImg()">削除</a>
+                                </div>
                             </div>
                             <p>[[meta]]</p>
                         </template>
