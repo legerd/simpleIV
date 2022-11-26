@@ -34,7 +34,7 @@ ngrok.set_auth_token(NGROK_AUTH)
 
 http_tunnel = ngrok.connect(5000)
 tunnels = ngrok.get_tunnels()
-print(tunnels)
+print("\033[32;1m***NGROK PUBLIC URL***:\033[34m",tunnels[0].public_url,"\033[0m")
 
 
 @app.route("/")
