@@ -87,6 +87,12 @@
         h1{
             width:500px;
         }
+        a.button{
+            color: #485fc7;
+        }
+        /* .button a{
+            display: block;
+        } */
 
         /* .button{
             background:#f3f3f3;
@@ -201,9 +207,7 @@
                 <div class="img-viewer">
                     
                     <div class="sidebar">
-                        <div class="tab-button button">
-                            <a href="/album">アルバム</a>
-                        </div>
+                        <a class="tab-button button" href="/album">アルバム</a>
                         {{ pagination.info }}
                         {{ pagination.links }}
                         <!-- <nav aria-label="...">
@@ -236,10 +240,10 @@
                         <template v-else>
                             <img :src="src_selected">
                             <div class="buttons">
-                                <div class="download-button button"><a :href="src_selected" download><i class="fas fa-download"></i></a></div>
-                                <div class="del-button button">
-                                    <a @click="delSelectedImg()">削除</a>
-                                </div>
+                                <a class="download-button button" :href="src_selected" download><i class="fas fa-download"></i></a>
+                                <!-- <div @click="delSelectedImg()" class="del-button button"> -->
+                                <a  @click="delSelectedImg()" class="del-button button">削除</a>
+                                <!-- </div> -->
                             </div>
                             <p>[[meta]]</p>
                         </template>
@@ -257,6 +261,8 @@
         Vue.use(Viewer);
         var img_src_list={{img_src_list|tojson}};
         let meta={{meta|tojson}};
+        let page="{{pagination.page}}";
+        let max_page="{{(pagination.total-1)//pagination.per_page+1}}";
         const Toast = Swal.mixin({
             toast: true,
             position: 'top-end',
@@ -323,8 +329,11 @@
             },
             methods:{
                 onKeyDown(event) {
-                    ARROW_DOWN="40"
-                    ARROW_UP="38"
+                    ARROW_LEFT="37";
+                    ARROW_UP="38";
+                    ARROW_RIGHT="39";
+                    ARROW_DOWN="40";
+                    
 
                     if(ARROW_DOWN==event.keyCode){
                         event.preventDefault();
@@ -338,6 +347,21 @@
                             this.selected_id-=1;
                         }
                     }
+                    if(ARROW_RIGHT==event.keyCode){
+                        event.preventDefault();
+                        if(page<max_page){
+                            console.log("right key");
+                            location.href = "/?page="+(parseInt(page)+1);
+                        }
+                    }
+                    if(ARROW_LEFT==event.keyCode){
+                        event.preventDefault();
+                        if(page>1){
+                            console.log("lef")
+                            location.href = "/?page="+(parseInt(page)-1);
+                        }
+                    }
+                    
                 },
                 selectImg:function(index){
                     this.selected_id=index;

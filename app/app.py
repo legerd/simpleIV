@@ -42,7 +42,9 @@ def show_list():
     generation_type= request.args.get("type", type=str, default="t2i")
     s_zero=time.time()
     page= request.args.get("page", type=int, default=1)
-    limit = 10
+    limit= request.args.get("limit", type=int, default=100)
+    
+    # limit = 10
     if generation_type=="t2i":
         img_src_list=glob.glob(OUTPUTS_DIR+"stable-diffusion-webui/outputs/txt2img-images/*.png")
     else:
@@ -51,9 +53,11 @@ def show_list():
     img_src_list=sorted(img_src_list,key=get_img_id_from_path, reverse=True)
     img_src_list_page=img_src_list[(page - 1)*limit: page*limit]
     ln=len(img_src_list)
+    if page<0 or page>(ln-1)//limit+1:
+        page=1
     # prompt_info_list_page=[get_pnginfo(img_src.replace("/static/","/mnt/vol_b/")) for img_src in img_src_list_page]
     pagination = Pagination(page=page, per_page=limit,page_parameter="page",css_framework='',inner_window=1,outer_window=0,link_size=0.7, total=ln,)
-    my_pagination_links=["/"]
+    # my_pagination_links=["/"]
     # max_page=
     # if page==1:
     #     my_pagination_links.append("")
@@ -88,6 +92,7 @@ def del_img():
 @app.route("/album")
 def show_album():
     generation_type= request.args.get("type", type=str, default="t2i")
+    limit= request.args.get("limit", type=int, default=100)
     s_zero=time.time()
     page= request.args.get("page", type=int, default=1)
     limit = 12
