@@ -207,7 +207,7 @@
                 <div class="img-viewer">
                     
                     <div class="sidebar">
-                        <a class="tab-button button" href="/album">アルバム</a>
+                        <a class="tab-button button" :href="'/album?path='+path">アルバム</a>
                         {{ pagination.info }}
                         {{ pagination.links }}
                         <!-- <nav aria-label="...">
@@ -263,6 +263,7 @@
         let meta={{meta|tojson}};
         let page="{{pagination.page}}";
         let max_page="{{(pagination.total-1)//pagination.per_page+1}}";
+        let path=encodeURIComponent("{{path}}");
         const Toast = Swal.mixin({
             toast: true,
             position: 'top-end',
@@ -286,6 +287,7 @@
                     "opened":false,
                 },
                 selected_id:0,
+                path:path,
                 // infoOfPrompt:"",
             },
             computed:{
@@ -351,14 +353,14 @@
                         event.preventDefault();
                         if(page<max_page){
                             console.log("right key");
-                            location.href = "/?page="+(parseInt(page)+1);
+                            location.href = "?page="+(parseInt(page)+1);
                         }
                     }
                     if(ARROW_LEFT==event.keyCode){
                         event.preventDefault();
                         if(page>1){
                             console.log("lef")
-                            location.href = "/?page="+(parseInt(page)-1);
+                            location.href = "?page="+(parseInt(page)-1);
                         }
                     }
                     

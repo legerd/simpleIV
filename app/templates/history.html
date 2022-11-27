@@ -165,7 +165,7 @@
             <div class="header">
                 <h1>画像ビューア：<span class="subtitle">ヒストリー</span></h1>
                 <div class="tab-button">
-                    <a href="/">リスト</a>
+                    <a :href="'/list?path='+path">リスト</a>
                 </div>
             </div>
             <div class="contents">
@@ -186,6 +186,7 @@
         const Viewer = window['VueViewer'].default;
         Vue.use(Viewer);
         var img_src_list=eval({{img_src_list|tojson}});
+        let path=encodeURIComponent("{{path}}");
         // console.log(prompt_info_list[0])
         var app = new Vue({
             el: '#app',
@@ -198,6 +199,7 @@
                     "png-info":true,
                     "opened":false,
                 },
+                path:path,
                 // infoOfPrompt:"",
             },
             
